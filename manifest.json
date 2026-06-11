@@ -14,9 +14,18 @@
     "<all_urls>"
   ],
   "background": {
-    "service_worker": "background.js"
+    "scripts": [
+      "lib/capture-core.js",
+      "background.js"
+    ]
   },
   "action": {
     "default_title": "Download to cURL Capture"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "download-to-curl@example.local",
+      "strict_min_version": "109.0"
+    }
   }
 }

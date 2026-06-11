@@ -1,4 +1,6 @@
-importScripts("lib/capture-core.js");
+if (!self.DownloadToCurlCore && typeof importScripts === "function") {
+  importScripts("lib/capture-core.js");
+}
 
 var Core = self.DownloadToCurlCore;
 
@@ -111,7 +113,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
     scheduleCleanup(details.requestId);
   },
   { urls: ["<all_urls>"] },
-  ["requestHeaders", "extraHeaders"]
+  ["requestHeaders"]
 );
 
 chrome.webRequest.onSendHeaders.addListener(
@@ -126,7 +128,7 @@ chrome.webRequest.onSendHeaders.addListener(
     scheduleCleanup(details.requestId);
   },
   { urls: ["<all_urls>"] },
-  ["requestHeaders", "extraHeaders"]
+  ["requestHeaders"]
 );
 
 chrome.webRequest.onHeadersReceived.addListener(
@@ -181,7 +183,7 @@ chrome.webRequest.onHeadersReceived.addListener(
     return { cancel: true };
   },
   { urls: ["<all_urls>"] },
-  ["blocking", "responseHeaders", "extraHeaders"]
+  ["blocking", "responseHeaders"]
 );
 
 chrome.webRequest.onErrorOccurred.addListener(

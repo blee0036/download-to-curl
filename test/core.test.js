@@ -68,7 +68,7 @@ test("infers filename using RFC5987 content-disposition before URL fallback", ()
   assert.equal(Core.inferFilename("not a url", []), "not a url");
 });
 
-test("infers filename from URL before optional Chrome download metadata", () => {
+test("infers filename from URL before optional browser download metadata", () => {
   assert.equal(
     Core.inferFilename(
       "https://example.com/files/url-name.zip",
@@ -129,7 +129,7 @@ test("builds Linux/macOS curl with headers, body, filename, and shell quoting", 
   assert.match(record.curl, /-o 'export report\.xlsx'$/);
 });
 
-test("reports important headers that Chrome did not expose", () => {
+test("reports important headers that the browser did not expose", () => {
   const exposure = Core.buildHeaderExposure([{ name: "Cookie", value: "session=abc" }]);
   const cookie = exposure.find((header) => header.name === "cookie");
   const authorization = exposure.find((header) => header.name === "authorization");
@@ -137,7 +137,7 @@ test("reports important headers that Chrome did not expose", () => {
   assert.deepEqual(cookie, { name: "cookie", value: "session=abc", exposed: true });
   assert.deepEqual(authorization, {
     name: "authorization",
-    value: "Not exposed by Chrome",
+    value: "Not exposed by browser",
     exposed: false
   });
 });

@@ -93,7 +93,7 @@
     var badges = node.querySelector(".badges");
     [
       record.interceptStatus || "Intercepted",
-      record.headerStatus || "Not exposed by Chrome",
+      record.headerStatus || "Not exposed by browser",
       record.matchReason || "matched"
     ].forEach(function (label) {
       var badge = document.createElement("span");
@@ -159,7 +159,7 @@
 
   function formatHeaders(headers) {
     if (!Array.isArray(headers) || !headers.length) {
-      return "Not exposed by Chrome";
+      return "Not exposed by browser";
     }
     return headers
       .map(function (header) {

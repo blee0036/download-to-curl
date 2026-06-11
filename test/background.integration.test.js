@@ -226,7 +226,7 @@ test("background finds an existing capture page tab before creating a new one", 
     customRules: []
   });
   harness.tabs.queryResults = [
-    { id: 55, windowId: 88, url: "chrome-extension://test/capture.html#latest" }
+    { id: 55, windowId: 88, url: "moz-extension://test/capture.html#latest" }
   ];
 
   emit(harness.events.webRequest.onBeforeRequest, {
@@ -284,7 +284,7 @@ function createBackgroundHarness(initialStorage) {
     runtime: {
       onMessage: events.runtime.onMessage,
       getURL(resource) {
-        return `chrome-extension://test/${resource}`;
+        return `moz-extension://test/${resource}`;
       },
       lastError: null
     },

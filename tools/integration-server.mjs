@@ -68,13 +68,8 @@ const server = createServer((request, response) => {
     return;
   }
 
-  if (url.pathname === "/update.xml") {
-    serveFile(join(distDir, "update.xml"), "application/xml; charset=utf-8", response);
-    return;
-  }
-
-  if (url.pathname.endsWith(".crx")) {
-    serveFile(join(distDir, basename(url.pathname)), "application/x-chrome-extension", response);
+  if (url.pathname.endsWith(".xpi")) {
+    serveFile(join(distDir, basename(url.pathname)), "application/x-xpinstall", response);
     return;
   }
 
@@ -84,8 +79,8 @@ const server = createServer((request, response) => {
 
 server.listen(port, host, () => {
   console.log(`Integration server: http://${host}:${port}/`);
-  console.log(`Update manifest:    http://${host}:${port}/update.xml`);
-  console.log(`CRX directory:      ${distDir}`);
+  console.log(`XPI URL:            http://${host}:${port}/download-to-curl.xpi`);
+  console.log(`XPI directory:      ${distDir}`);
 });
 
 function serveFile(filePath, contentType, response) {
@@ -103,11 +98,8 @@ function serveFile(filePath, contentType, response) {
 }
 
 function guessContentType(filePath) {
-  if (extname(filePath) === ".xml") {
-    return "application/xml; charset=utf-8";
-  }
-  if (extname(filePath) === ".crx") {
-    return "application/x-chrome-extension";
+  if (extname(filePath) === ".xpi") {
+    return "application/x-xpinstall";
   }
   return "application/octet-stream";
 }

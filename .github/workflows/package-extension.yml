@@ -1,12 +1,7 @@
-name: 打包 Chrome 扩展
+name: 打包 Firefox 扩展
 
 on:
   workflow_dispatch:
-    inputs:
-      crx_url:
-        description: "CRX 最终下载地址；留空时使用仓库变量 DOWNLOAD_TO_CURL_CRX_URL，标签构建再留空则使用 GitHub 发布页地址"
-        required: false
-        type: string
   push:
     tags:
       - "v*"
@@ -16,15 +11,11 @@ permissions:
 
 jobs:
   package:
-    name: 打包 CRX
+    name: 打包 XPI
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./
-    env:
-      CRX_URL_INPUT: ${{ github.event.inputs.crx_url }}
-      CRX_URL_VAR: ${{ vars.DOWNLOAD_TO_CURL_CRX_URL }}
-      EXTENSION_KEY_B64: ${{ secrets.CHROME_EXTENSION_PRIVATE_KEY_B64 }}
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
@@ -37,88 +28,34 @@ jobs:
       - name: 运行自动化测试
         run: npm test
 
-      - name: 生成扩展运行时目录
-        run: npm run stage
+      - name: 打包 XPI
+        run: npm run package:xpi
 
-      - name: 写入扩展私钥
+      - name: 生成包信息
         shell: bash
         run: |
           set -euo pipefail
-          if [ -z "${EXTENSION_KEY_B64}" ]; then
-            echo "::error::缺少 CHROME_EXTENSION_PRIVATE_KEY_B64 仓库密钥。请先生成固定私钥并写入仓库密钥。"
-            exit 1
-          fi
-          printf "%s" "${EXTENSION_KEY_B64}" | base64 --decode > dist/download-to-curl.pem
-          chmod 600 dist/download-to-curl.pem
-
-      - name: 查找 Chrome
-        id: chrome
-        shell: bash
-        run: |
-          set -euo pipefail
-          CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
-          if [ -z "${CHROME_BIN}" ]; then
-            echo "::error::当前 runner 没有 Chrome/Chromium。请改用 ubuntu-latest，或在自托管 runner 预装 Chrome。"
-            exit 1
-          fi
-          echo "bin=${CHROME_BIN}" >> "${GITHUB_OUTPUT}"
-          "${CHROME_BIN}" --version
-
-      - name: 打包 CRX
-        shell: bash
-        run: |
-          set -euo pipefail
-          xvfb-run -a "${{ steps.chrome.outputs.bin }}" \
-            --pack-extension="${PWD}/dist/extension" \
-            --pack-extension-key="${PWD}/dist/download-to-curl.pem" \
-            --no-message-box
-
-          test -f dist/extension.crx
-          mv dist/extension.crx dist/download-to-curl.crx
-
-      - name: 生成扩展 ID 和 update.xml
-        id: metadata
-        shell: bash
-        run: |
-          set -euo pipefail
-          EXTENSION_ID="$(npm run --silent extension:id -- dist/download-to-curl.pem)"
-
-          CRX_URL="${CRX_URL_INPUT:-${CRX_URL_VAR:-}}"
-          if [ -z "${CRX_URL}" ] && [ "${GITHUB_REF_TYPE}" = "tag" ]; then
-            CRX_URL="https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/download-to-curl.crx"
-          fi
-          if [ -z "${CRX_URL}" ]; then
-            echo "::error::缺少 CRX 下载地址。请在手动触发时填写 crx_url，或配置仓库变量 DOWNLOAD_TO_CURL_CRX_URL，或使用 v* 标签触发。"
-            exit 1
-          fi
-
-          npm run make:update -- --id "${EXTENSION_ID}" --crx-url "${CRX_URL}" --out dist/update.xml
-
+          VERSION="$(node -p "require('./manifest.json').version")"
+          XPI_URL="请把 dist/download-to-curl.xpi 发布到 Firefox 可访问的 HTTPS 或 file:/// 地址。"
           if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
-            UPDATE_XML_URL="https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/update.xml"
-          else
-            UPDATE_XML_URL="请把 dist/update.xml 发布到 Chrome 策略可访问的 HTTPS 地址。"
+            XPI_URL="https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/download-to-curl.xpi"
           fi
 
           {
-            echo "扩展 ID: ${EXTENSION_ID}"
-            echo "CRX 下载地址: ${CRX_URL}"
-            echo "update.xml 地址: ${UPDATE_XML_URL}"
+            echo "扩展 ID: download-to-curl@example.local"
+            echo "版本: ${VERSION}"
+            echo "XPI 下载地址: ${XPI_URL}"
             if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
-              echo "Chrome 策略安装值: ${EXTENSION_ID};${UPDATE_XML_URL}"
+              echo "Firefox ExtensionSettings 策略 install_url: ${XPI_URL}"
             fi
           } > dist/package-info.txt
-
-          echo "extension_id=${EXTENSION_ID}" >> "${GITHUB_OUTPUT}"
-          echo "crx_url=${CRX_URL}" >> "${GITHUB_OUTPUT}"
 
       - name: 上传打包产物
         uses: actions/upload-artifact@v4
         with:
-          name: download-to-curl-package
+          name: download-to-curl-firefox-package
           path: |
-            ./dist/download-to-curl.crx
-            ./dist/update.xml
+            ./dist/download-to-curl.xpi
             ./dist/package-info.txt
           if-no-files-found: error
 
@@ -130,10 +67,9 @@ jobs:
         run: |
           set -euo pipefail
           gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1 || \
-            gh release create "${GITHUB_REF_NAME}" --title "${GITHUB_REF_NAME}" --notes "Download to cURL Capture 打包产物"
+            gh release create "${GITHUB_REF_NAME}" --title "${GITHUB_REF_NAME}" --notes "Download to cURL Capture Firefox XPI"
 
           gh release upload "${GITHUB_REF_NAME}" \
-            dist/download-to-curl.crx \
-            dist/update.xml \
+            dist/download-to-curl.xpi \
             dist/package-info.txt \
             --clobber
