@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Download to cURL Capture",
+  "version": "0.1.0",
+  "description": "Intercept matching browser downloads and generate Linux/macOS curl commands locally.",
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "storage",
+    "tabs",
+    "clipboardWrite"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Download to cURL Capture"
+  }
+}

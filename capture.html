@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Curl Capture</title>
+    <link rel="stylesheet" href="capture.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <h1>Curl Capture</h1>
+        <p class="subtitle">Captured curl commands stay in this browser profile.</p>
+      </div>
+      <div class="controls">
+        <label class="switch">
+          <input id="captureToggle" type="checkbox">
+          <span class="slider"></span>
+          <span class="switchText">Capture Downloads</span>
+        </label>
+        <button id="clearRecords" class="secondary" type="button">Clear</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="warning">
+        Generated commands can include Cookie, Authorization, and other login headers. Do not share them unless you intend to share that access.
+      </section>
+
+      <section class="rulesPanel">
+        <div class="sectionHeader">
+          <div>
+            <h2>Custom download rules</h2>
+            <p>One substring, wildcard, or /regex/ per line. Rules match URL and response headers.</p>
+          </div>
+          <button id="saveRules" class="secondary" type="button">Save rules</button>
+        </div>
+        <textarea id="customRules" spellcheck="false" placeholder="example.com/export&#10;*.custom-download&#10;/content-type: application\\/x-custom/i"></textarea>
+        <div id="rulesStatus" class="statusText" aria-live="polite"></div>
+      </section>
+
+      <section class="recordsPanel">
+        <div class="sectionHeader">
+          <div>
+            <h2>Recent captures</h2>
+            <p>Latest records are shown first. Only the newest 20 records are kept.</p>
+          </div>
+          <span id="recordCount" class="badge">0</span>
+        </div>
+        <div id="emptyState" class="emptyState">No captured downloads yet.</div>
+        <div id="records"></div>
+      </section>
+    </main>
+
+    <template id="recordTemplate">
+      <article class="record">
+        <div class="recordMain">
+          <div class="recordTitle"></div>
+          <div class="recordUrl"></div>
+          <div class="metaLine"></div>
+          <div class="badges"></div>
+        </div>
+        <div class="recordActions">
+          <button class="copyCurl" type="button">Copy curl</button>
+          <button class="toggleDetails secondary" type="button">Show details</button>
+        </div>
+        <div class="details" hidden>
+          <label>
+            curl command
+            <textarea class="curlOutput" readonly spellcheck="false"></textarea>
+          </label>
+          <div class="detailsGrid">
+            <section>
+              <h3>Important headers</h3>
+              <table class="importantHeaders"></table>
+            </section>
+            <section>
+              <h3>Request body</h3>
+              <pre class="requestBody"></pre>
+            </section>
+          </div>
+          <details>
+            <summary>Raw request headers</summary>
+            <pre class="requestHeaders"></pre>
+          </details>
+          <details>
+            <summary>Raw response headers</summary>
+            <pre class="responseHeaders"></pre>
+          </details>
+          <details>
+            <summary>Metadata</summary>
+            <pre class="metadata"></pre>
+          </details>
+        </div>
+      </article>
+    </template>
+
+    <script src="lib/capture-core.js"></script>
+    <script src="capture.js"></script>
+  </body>
+</html>

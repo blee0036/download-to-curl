@@ -1,0 +1,13 @@
+{
+  "name": "download-to-curl-capture",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test",
+    "stage": "node tools/stage-extension.mjs",
+    "extension:id": "node tools/extension-id-from-pem.mjs",
+    "make:update": "node tools/generate-update-manifest.mjs",
+    "integration:server": "node tools/integration-server.mjs"
+  },
+  "devDependencies": {}
+}
