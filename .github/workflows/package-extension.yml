@@ -124,7 +124,6 @@ jobs:
 
       - name: 发布到 GitHub 发布页
         if: startsWith(github.ref, 'refs/tags/')
-        working-directory: download-to-curl
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
