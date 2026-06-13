@@ -105,8 +105,6 @@ download-to-curl.xpi
 package-info.txt
 ```
 
-如果仓库是私有仓库，GitHub 发布页资产通常不适合作为策略安装源。请把 `download-to-curl.xpi` 发布到 Firefox 可直接访问、无需登录态的 HTTPS 静态文件服务，或在本机策略中使用 `file:///` XPI 地址。
-
 ## Firefox 策略安装
 
 最终验收建议使用 Firefox Developer Edition 的 `policies.json` 安装扩展。
@@ -121,19 +119,6 @@ Firefox 策略文件位置取决于安装方式。常见路径：
 
 `policies.json` 示例：
 
-```json
-{
-  "policies": {
-    "ExtensionSettings": {
-      "download-to-curl@example.local": {
-        "installation_mode": "force_installed",
-        "install_url": "file:///D:/git-project/idea_zone/download-to-curl/dist/download-to-curl.xpi"
-      }
-    }
-  }
-}
-```
-
 如果使用 HTTPS 发布地址：
 
 ```json
@@ -142,7 +127,7 @@ Firefox 策略文件位置取决于安装方式。常见路径：
     "ExtensionSettings": {
       "download-to-curl@example.local": {
         "installation_mode": "force_installed",
-        "install_url": "https://example.com/extensions/download-to-curl.xpi"
+        "install_url": "https://github.com/blee0036/download-to-curl/releases/latest/download/download-to-curl.xpi"
       }
     }
   }
